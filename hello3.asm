@@ -1,7 +1,7 @@
 ;this file is calculate the length of string.
 ;and set the write to screen
 ;the exit process with no error.
-
+;changed for github test.
 
 SECTION .data
 msg	db	'Hello, brave new world!', 0ah
