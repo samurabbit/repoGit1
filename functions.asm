@@ -1,4 +1,57 @@
-;--------------------------------
+;--------------------------------------
+;void iprint(int)
+;int turn to ascii and print
+;a number bigger than 10 is div to N part
+;and save in stack. then pop to print
+
+iprint:
+	push	eax
+	push	ecx
+	push	edx
+	push	esi
+	mov	ecx,0
+divLoop:
+	inc	ecx
+	mov	edx,0
+	mov	esi,10
+	idiv	esi
+	add	edx,48
+	push	edx
+	cmp	eax,0
+	jnz	divLoop
+printLoop:
+	dec	ecx
+	mov	eax,esp
+	call	sprint
+	pop	eax
+	cmp	ecx,0
+	jnz	printLoop
+
+	pop	esi
+	pop	edx
+	pop	ecx
+	pop	eax
+	ret
+
+;--------------------------------------
+;void iprintLF(int)
+;iprint with a LF
+;use stack addr to send print
+
+iprintLF:
+	call	iprint
+
+	push	eax
+	mov	eax,0ah
+	push	eax
+	mov	eax,esp
+	call	sprint
+	pop	eax
+	pop	eax
+	ret
+
+
+;--------------------------------------
 ;int slen(string message)
 ;string length calculation function
 ;input:EAX as addr of string
@@ -17,7 +70,7 @@ slen:
 	pop	ebx
 	ret
 
-;------------------------------------
+;--------------------------------------
 ;void sprint(string message)
 ;String pring function
 ;input:EAX as addr of string
