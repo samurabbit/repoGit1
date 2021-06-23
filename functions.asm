@@ -44,6 +44,28 @@ sprint:
 	pop	edx
 	ret
 
+
+;--------------------------------------
+;void printLF(string message)
+;string print with a line feed
+;use stack to store temp data
+;input:EAX addr of string
+;output:I/O
+
+sprintLF:
+	call	sprint
+
+	push	eax
+	mov	eax,0ah
+	push	eax
+	mov	eax,esp
+	call	sprint
+	
+	pop	eax
+	pop	eax
+	ret
+
+
 ;--------------------------------------
 ;void exit()
 ;Exit program and restore resources
