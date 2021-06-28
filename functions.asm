@@ -1,4 +1,46 @@
 ;--------------------------------------
+;int atoi(string number)
+;trans ascii to int
+;input:EAX addr of string
+;output:EAX int
+
+atoi:
+	;save regs
+	push	ebx
+	push	ecx
+	push	edx
+	push	esi
+	
+	;get length of string
+	mov	esi,eax
+	call	slen
+	mov	ecx,eax
+	mov	edx,10
+
+	;loop for chars
+.loopChar:
+	xor	ebx,ebx
+	mov	bl,byte[esi]
+	cmp	bl,48
+	jl	.zeroSet
+	cmp	bl,57
+	jg	.zeroSet
+	mul	edx
+	add	eax,ebx
+	loop	.loopChar
+	jmp	.finish
+  .zeroSet:
+	mov	eax,0		;if not pure number,set to 0
+
+	;restore
+.finish:
+	pop	esi
+	pop	edx
+	pop	ecx
+	pop	ebx
+	ret
+
+;--------------------------------------
 ;void iprint(int)
 ;int turn to ascii and print
 ;a number bigger than 10 is div to N part
