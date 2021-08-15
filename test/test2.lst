@@ -1,0 +1,143 @@
+     1                                  ;test2.asm
+     2                                  org	0100h
+     3 00000000 EB7E                    jmp	Label_Start
+     4                                  
+     5                                  %include "tfunc.asm"
+     6                              <1> ;--------------------------------------
+     7                              <1> ;func:	DispStr
+     8                              <1> ;功能：显示字符串，每个字符串以/0结尾
+     9                              <1> ;input: AX = as addr of string
+    10                              <1> ;output:AX = length of string
+    11                              <1> DispStr:
+    12 00000002 55                  <1> 	push	bp
+    13 00000003 06                  <1> 	push	es
+    14 00000004 51                  <1> 	push	cx
+    15 00000005 53                  <1> 	push	bx
+    16 00000006 52                  <1> 	push	dx
+    17                              <1> 
+    18 00000007 89C5                <1> 	mov	bp,ax
+    19 00000009 E82D00              <1> 	call	StrLength
+    20 0000000C 89C1                <1> 	mov	cx,ax		;get length
+    21 0000000E 8CD8                <1> 	mov	ax,ds
+    22 00000010 8EC0                <1> 	mov	es,ax
+    23                              <1> 	
+    24 00000012 51                  <1> 	push	cx
+    25 00000013 B403                <1> 	mov	ah,03h
+    26 00000015 B700                <1> 	mov	bh,00h
+    27 00000017 CD10                <1> 	int	10h
+    28 00000019 59                  <1> 	pop	cx
+    29                              <1> 
+    30 0000001A B80113              <1> 	mov	ax,01301h
+    31 0000001D BB0700              <1> 	mov	bx,0007h
+    32                              <1> 	;mov	dl,0
+    33 00000020 CD10                <1> 	int	10h
+    34                              <1> 	
+    35 00000022 5A                  <1> 	pop	dx
+    36 00000023 5B                  <1> 	pop	bx
+    37 00000024 59                  <1> 	pop	cx
+    38 00000025 07                  <1> 	pop	es
+    39 00000026 5D                  <1> 	pop	bp
+    40 00000027 C3                  <1> 	ret
+    41                              <1> ;end=============================
+    42                              <1> 
+    43                              <1> ;--------------------------
+    44                              <1> ;func:	DispLF
+    45                              <1> ;output a LF
+    46                              <1> ;in:no
+    47                              <1> ;out:no
+    48                              <1> DispLF:
+    49 00000028 52                  <1> 	push	dx
+    50 00000029 50                  <1> 	push	ax
+    51                              <1> 
+    52 0000002A B20D                <1> 	mov	dl,0dh
+    53 0000002C B402                <1> 	mov	ah,02h
+    54 0000002E CD21                <1> 	int	21h
+    55 00000030 B20A                <1> 	mov	dl,0ah
+    56 00000032 B402                <1> 	mov	ah,02h
+    57 00000034 CD21                <1> 	int	21h
+    58                              <1> 
+    59 00000036 58                  <1> 	pop	ax
+    60 00000037 5A                  <1> 	pop	dx
+    61 00000038 C3                  <1> 	ret
+    62                              <1> ;==DispLF===end===========
+    63                              <1> 
+    64                              <1> 
+    65                              <1> ;---------------
+    66                              <1> ;func:	StrLength
+    67                              <1> ;use:	return length of string.str is end by 0.
+    68                              <1> ;input: AX=addr of string
+    69                              <1> ;output:AX=length
+    70                              <1> StrLength:
+    71 00000039 56                  <1> 	push	si
+    72 0000003A 06                  <1> 	push	es
+    73 0000003B 51                  <1> 	push	cx
+    74                              <1> 
+    75 0000003C 89C6                <1> 	mov	si,ax
+    76 0000003E 8CD8                <1> 	mov	ax,ds
+    77 00000040 8EC0                <1> 	mov	es,ax
+    78 00000042 31C9                <1> 	xor	cx,cx
+    79 00000044 FC                  <1> 	cld
+    80 00000045 AC                  <1> .load:	lodsb
+    81 00000046 41                  <1> 	inc	cx
+    82 00000047 3C00                <1> 	cmp	al,0
+    83 00000049 75FA                <1> 	jnz	.load
+    84 0000004B 89C8                <1> 	mov	ax,cx
+    85                              <1> 	
+    86 0000004D 59                  <1> 	pop	cx
+    87 0000004E 07                  <1> 	pop	es
+    88 0000004F 5E                  <1> 	pop	si
+    89 00000050 C3                  <1> 	ret
+    90                              <1> ;end================================
+    91                              <1> 
+    92                              <1> ;-------------------------------
+    93                              <1> ;func:	StrInput
+    94                              <1> ;get input from std, end by LF
+    95                              <1> ;in:	AX=addr of buffer
+    96                              <1> ;out:	AX=count of word
+    97                              <1> StrInput:
+    98 00000051 57                  <1> 	push	di
+    99 00000052 51                  <1> 	push	cx
+   100                              <1> 
+   101 00000053 89C7                <1> 	mov	di,ax
+   102 00000055 B401                <1> 	mov	ah,01h
+   103 00000057 31C9                <1> 	xor	cx,cx
+   104 00000059 FC                  <1> 	cld
+   105                              <1> .in:	
+   106 0000005A 83F90F              <1> 	cmp	cx,0fh
+   107 0000005D 740A                <1> 	jz	.end
+   108 0000005F CD21                <1> 	int	21h
+   109 00000061 3C0A                <1> 	cmp	al,0ah	;LF is 0ah
+   110 00000063 7404                <1> 	jz	.end
+   111 00000065 AA                  <1> 	stosb
+   112 00000066 41                  <1> 	inc	cx
+   113 00000067 EBF1                <1> 	jmp	.in
+   114                              <1> .end:
+   115 00000069 89C8                <1> 	mov	ax,cx	;get count of input
+   116                              <1> 
+   117 0000006B 59                  <1> 	pop	cx
+   118 0000006C 5F                  <1> 	pop	di
+   119 0000006D C3                  <1> 	ret
+   120                              <1> ;===StrInput===end==================
+     6                                  
+     7                                  Label_Data:
+     8 0000006E 412074657374204D65-     	Msg1	db	"A test Message",00h
+     8 00000077 737361676500       
+     9 0000007D 0A0D00                  	MsgLF	db	0ah,0dh,00h
+    10                                  
+    11                                  Label_Start:
+    12                                  	;init
+    13 00000080 8CC8                    	mov	ax,cs
+    14 00000082 8ED8                    	mov	ds,ax
+    15 00000084 8EC0                    	mov	es,ax
+    16 00000086 8ED0                    	mov	ss,ax
+    17 00000088 BC0001                  	mov	sp,0100h
+    18                                  
+    19                                  	;test printLF
+    20 0000008B B8[6E00]                	mov	ax,Msg1
+    21 0000008E E871FF                  	call	DispStr
+    22                                  ;	mov	ax,MsgLF
+    23                                  ;	call	DispStr
+    24                                  ;	mov	ax,Msg1
+    25 00000091 E894FF                  	call	DispLF
+    26 00000094 B8[6E00]                	mov	ax,Msg1
+    27 00000097 E868FF                  	call	DispStr
